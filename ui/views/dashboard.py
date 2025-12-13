@@ -1,3 +1,4 @@
+# ui/views/dashboard.py
 import flet as ft
 from ui.components.cards import InfoCard
 

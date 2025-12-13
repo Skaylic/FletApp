@@ -1,3 +1,4 @@
+# main.py
 import flet as ft
 from ui.main_app import FletApp
 

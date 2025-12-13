@@ -1,3 +1,4 @@
+# ui/layouts/footer.py
 import flet as ft
 from datetime import datetime
 import asyncio

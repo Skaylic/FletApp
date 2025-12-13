@@ -1,3 +1,4 @@
+# ui/main_app.py
 import flet as ft
 from ui.views.dashboard import DashboardView
 from ui.views.settings import SettingsView

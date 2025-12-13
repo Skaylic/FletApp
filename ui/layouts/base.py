@@ -1,3 +1,4 @@
+# ui/layouts/base.py
 import flet as ft
 from ui.layouts.footer import Footer
 

@@ -1,3 +1,4 @@
+# ui/layouts/appbar.py
 import flet as ft
 from flet.core.alert_dialog import AlertDialog
 

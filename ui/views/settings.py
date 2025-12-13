@@ -1,3 +1,4 @@
+# ui/views/settings.py
 import flet as ft
 
 
