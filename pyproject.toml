@@ -1,0 +1,31 @@
+[project]
+name = 'Track_app'
+version = '0.1.0'
+description = 'Приложение для поиска авто'
+readme = 'README.md'
+requires-python = ">=3.11"
+authors = [
+    {name='Ksq developer', email='ksq@example.com'}
+]
+dependencies = [
+    "flet==0.27.6",
+    "flet_route==0.3.3",
+    "requests",
+    "python-dotenv",
+    "flet-geolocator",
+    "flet-map",
+    "geopy"
+]
+
+[tool.flet.flutter.dependencies]
+flet_map = "1.0.0"
+
+[tool.flet]
+org = 'ksqcompany'
+product = 'TrackApp'
+company = 'Ksq Company'
+copyright = 'Copyright (c) 2025 by ksqcompany'
+
+[tool.flet.android.permission]
+"android.permission.ACCESS_FINE_LOCATION" = true
+"android.permission.ACCESS_COARSE_LOCATION" = true
