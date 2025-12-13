@@ -7,8 +7,8 @@ class AppTheme:
     def light_theme():
         return ft.Theme(
             color_scheme=ft.ColorScheme(
-                primary=ft.colors.BLUE,
-                secondary=ft.colors.GREEN,
+                primary=ft.Colors.BLUE,
+                secondary=ft.Colors.GREEN,
             )
         )
 
@@ -16,7 +16,7 @@ class AppTheme:
     def dark_theme():
         return ft.Theme(
             color_scheme=ft.ColorScheme(
-                primary=ft.colors.BLUE_200,
-                secondary=ft.colors.GREEN_200,
+                primary=ft.Colors.BLUE_200,
+                secondary=ft.Colors.GREEN_200,
             )
         )

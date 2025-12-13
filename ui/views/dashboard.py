@@ -16,36 +16,36 @@ class DashboardView(ft.Container):
             sales_card = InfoCard(
                 title="Sales",
                 value="1,234",
-                icon=ft.icons.SHOW_CHART,
-                color=ft.colors.BLUE
+                icon=ft.Icons.SHOW_CHART,
+                color=ft.Colors.BLUE
             )
             users_card = InfoCard(
                 title="Users",
                 value="567",
-                icon=ft.icons.PEOPLE,
-                color=ft.colors.GREEN
+                icon=ft.Icons.PEOPLE,
+                color=ft.Colors.GREEN
             )
         except:
             # Fallback если компонент не доступен
             sales_card = ft.Container(
                 content=ft.Column([
-                    ft.Icon(ft.icons.SHOW_CHART, size=40),
+                    ft.Icon(ft.Icons.SHOW_CHART, size=40),
                     ft.Text("Sales", size=20),
                     ft.Text("1,234", size=32, weight=ft.FontWeight.BOLD)
                 ]),
                 padding=20,
-                bgcolor=ft.colors.BLUE_50,
+                bgcolor=ft.Colors.BLUE_50,
                 border_radius=10,
                 expand=True
             )
             users_card = ft.Container(
                 content=ft.Column([
-                    ft.Icon(ft.icons.PEOPLE, size=40),
+                    ft.Icon(ft.Icons.PEOPLE, size=40),
                     ft.Text("Users", size=20),
                     ft.Text("567", size=32, weight=ft.FontWeight.BOLD)
                 ]),
                 padding=20,
-                bgcolor=ft.colors.GREEN_50,
+                bgcolor=ft.Colors.GREEN_50,
                 border_radius=10,
                 expand=True
             )

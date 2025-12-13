@@ -39,7 +39,7 @@ class SettingsView(ft.Container):
                 ),
                 ft.ElevatedButton(
                     text="Save Settings",
-                    icon=ft.icons.SAVE,
+                    icon=ft.Icons.SAVE,
                     on_click=self.on_save
                 )
             ]

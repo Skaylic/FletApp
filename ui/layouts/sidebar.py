@@ -17,7 +17,7 @@ class Sidebar(ft.Container):
 
         # Основные настройки контейнера
         self.width = 250  # Фиксированная ширина панели
-        self.bgcolor = ft.colors.GREY_100  # Цвет фона
+        self.bgcolor = ft.Colors.GREY_100  # Цвет фона
         self.padding = 0  # Без внутренних отступов
 
         # Состояние активного маршрута
@@ -39,10 +39,10 @@ class Sidebar(ft.Container):
         main_menu = ft.Column(
             controls=[
                 # Элементы навигации
-                self._create_menu_item("Dashboard", ft.icons.DASHBOARD, "dashboard"),
-                self._create_menu_item("Settings", ft.icons.SETTINGS, "settings"),
-                self._create_menu_item("Analytics", ft.icons.ANALYTICS, "analytics"),
-                self._create_menu_item("Documents", ft.icons.DESCRIPTION, "documents"),
+                self._create_menu_item("Dashboard", ft.Icons.DASHBOARD, "dashboard"),
+                self._create_menu_item("Settings", ft.Icons.SETTINGS, "settings"),
+                self._create_menu_item("Analytics", ft.Icons.ANALYTICS, "analytics"),
+                self._create_menu_item("Documents", ft.Icons.DESCRIPTION, "documents"),
             ],
             spacing=0,  # Без отступов между элементами
         )
@@ -52,9 +52,9 @@ class Sidebar(ft.Container):
             content=ft.Column(
                 controls=[
                     # Разделитель
-                    ft.Divider(color=ft.colors.GREY_300),
+                    ft.Divider(color=ft.Colors.GREY_300),
                     # Кнопка выхода
-                    self._create_menu_item("Logout", ft.icons.LOGOUT, "logout", is_danger=True),
+                    self._create_menu_item("Logout", ft.Icons.LOGOUT, "logout", is_danger=True),
                 ],
                 spacing=0,
             ),
@@ -84,7 +84,7 @@ class Sidebar(ft.Container):
 
         Args:
             label: Текст кнопки
-            icon: Иконка из набора ft.icons
+            icon: Иконка из набора ft.Icons
             route: Идентификатор маршрута
             is_danger: Флаг опасного действия (красный цвет)
 
@@ -165,7 +165,7 @@ class Sidebar(ft.Container):
         if old_route in self.menu_items and old_route != "logout":
             item = self.menu_items[old_route]
             # Прозраный фон
-            item['container'].bgcolor = ft.colors.TRANSPARENT
+            item['container'].bgcolor = ft.Colors.TRANSPARENT
             # Убираем границу
             item['container'].border = None
             # Обычный цвет иконки и текста
@@ -179,9 +179,9 @@ class Sidebar(ft.Container):
         if new_route in self.menu_items and new_route != "logout":
             item = self.menu_items[new_route]
             # Синий фон
-            item['container'].bgcolor = ft.colors.BLUE_50
+            item['container'].bgcolor = ft.Colors.BLUE_50
             # Синяя граница
-            item['container'].border = ft.border.all(1, ft.colors.BLUE_100)
+            item['container'].border = ft.border.all(1, ft.Colors.BLUE_100)
             # Яркие цвета для активного состояния
             item['icon'].color = self._get_icon_color(False, True)
             item['text'].color = self._get_text_color(False, True)
@@ -191,29 +191,29 @@ class Sidebar(ft.Container):
 
     # ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ УПРАВЛЕНИЯ СТИЛЯМИ
 
-    def _get_bgcolor(self, is_active: bool) -> ft.colors:
+    def _get_bgcolor(self, is_active: bool) -> ft.Colors:
         """Возвращает цвет фона в зависимости от состояния"""
-        return ft.colors.BLUE_50 if is_active else ft.colors.TRANSPARENT
+        return ft.Colors.BLUE_50 if is_active else ft.Colors.TRANSPARENT
 
     def _get_border(self, is_active: bool):
         """Возвращает границу в зависимости от состояния"""
-        return ft.border.all(1, ft.colors.BLUE_100) if is_active else None
+        return ft.border.all(1, ft.Colors.BLUE_100) if is_active else None
 
-    def _get_text_color(self, is_danger: bool, is_active: bool) -> ft.colors:
+    def _get_text_color(self, is_danger: bool, is_active: bool) -> ft.Colors:
         """Возвращает цвет текста"""
         if is_danger:
-            return ft.colors.RED_600  # Красный для опасных действий
+            return ft.Colors.RED_600  # Красный для опасных действий
         elif is_active:
-            return ft.colors.BLUE_700  # Синий для активного состояния
-        return ft.colors.BLUE_GREY_800  # Серо-синий для обычного состояния
+            return ft.Colors.BLUE_700  # Синий для активного состояния
+        return ft.Colors.BLUE_GREY_800  # Серо-синий для обычного состояния
 
-    def _get_icon_color(self, is_danger: bool, is_active: bool) -> ft.colors:
+    def _get_icon_color(self, is_danger: bool, is_active: bool) -> ft.Colors:
         """Возвращает цвет иконки"""
         if is_danger:
-            return ft.colors.RED_600  # Красный для опасных действий
+            return ft.Colors.RED_600  # Красный для опасных действий
         elif is_active:
-            return ft.colors.BLUE_600  # Синий для активного состояния
-        return ft.colors.BLUE_GREY_700  # Серо-синий для обычного состояния
+            return ft.Colors.BLUE_600  # Синий для активного состояния
+        return ft.Colors.BLUE_GREY_700  # Серо-синий для обычного состояния
 
     def _get_text_weight(self, is_active: bool):
         """Возвращает толщину шрифта"""

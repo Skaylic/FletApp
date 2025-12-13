@@ -11,7 +11,7 @@ class Footer(ft.Container):
         super().__init__()
         self.page = page
         self.height = 40
-        self.bgcolor = ft.colors.GREY_200
+        self.bgcolor = ft.Colors.GREY_200
         self.padding = ft.padding.symmetric(horizontal=20)
         self.margin = ft.margin.only(top=10)
 
@@ -48,7 +48,7 @@ class Footer(ft.Container):
                 ft.Text(
                     f"© {current_year} Flet Application. All rights reserved.",
                     size=12,
-                    color=ft.colors.GREY_700,
+                    color=ft.Colors.GREY_700,
                     font_family="Roboto",
                     no_wrap=True,
                 ),
@@ -68,7 +68,7 @@ class Footer(ft.Container):
                                     width=10,
                                     height=10,
                                     border_radius=5,
-                                    bgcolor=ft.colors.GREEN_500,
+                                    bgcolor=ft.Colors.GREEN_500,
                                     tooltip="Статус подключения",
                                     on_click=self._manual_connection_check_sync,
                                 ),
@@ -76,7 +76,7 @@ class Footer(ft.Container):
                                     ref=self.connection_text,
                                     value="Online",
                                     size=12,
-                                    color=ft.colors.GREEN_700,
+                                    color=ft.Colors.GREEN_700,
                                     weight=ft.FontWeight.W_400,
                                     font_family="Roboto",
                                     no_wrap=True,
@@ -87,7 +87,7 @@ class Footer(ft.Container):
                         ),
 
                         ft.VerticalDivider(
-                            color=ft.colors.GREY_400,
+                            color=ft.Colors.GREY_400,
                             width=1,
                             thickness=1,
                         ),
@@ -95,13 +95,13 @@ class Footer(ft.Container):
                         ft.Text(
                             "v1.0.0",
                             size=12,
-                            color=ft.colors.GREY_700,
+                            color=ft.Colors.GREY_700,
                             font_family="Roboto",
                             no_wrap=True,
                         ),
 
                         ft.VerticalDivider(
-                            color=ft.colors.GREY_400,
+                            color=ft.Colors.GREY_400,
                             width=1,
                             thickness=1,
                         ),
@@ -110,7 +110,7 @@ class Footer(ft.Container):
                             ref=self.time_text,
                             value=current_time,
                             size=12,
-                            color=ft.colors.GREY_700,
+                            color=ft.Colors.GREY_700,
                             font_family="Roboto",
                             no_wrap=True,
                         ),
@@ -158,9 +158,9 @@ class Footer(ft.Container):
 
         # Показываем состояние проверки
         self._set_connection_ui(
-            ft.colors.YELLOW_500,
+            ft.Colors.YELLOW_500,
             "Checking...",
-            ft.colors.YELLOW_700
+            ft.Colors.YELLOW_700
         )
 
         async def simulate_check():
@@ -195,8 +195,8 @@ class Footer(ft.Container):
         """
         self._is_connected = is_connected
 
-        dot_color = ft.colors.GREEN_500 if is_connected else ft.colors.RED_500
-        text_color = ft.colors.GREEN_700 if is_connected else ft.colors.RED_700
+        dot_color = ft.Colors.GREEN_500 if is_connected else ft.Colors.RED_500
+        text_color = ft.Colors.GREEN_700 if is_connected else ft.Colors.RED_700
         default_message = "Online" if is_connected else "Offline"
 
         self._set_connection_ui(

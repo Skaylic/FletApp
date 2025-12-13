@@ -2,7 +2,7 @@
 import flet as ft
 
 class InfoCard(ft.Container):
-    def __init__(self, title: str, value: str, icon: str, color: str = ft.colors.BLUE):
+    def __init__(self, title: str, value: str, icon: str, color: str = ft.Colors.BLUE):
         super().__init__()
         self.padding = 15
         self.border_radius = 10

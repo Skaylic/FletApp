@@ -19,7 +19,7 @@ class CustomAppBar(ft.Container):
 
         # Основные настройки контейнера
         self.height = 60  # Высота панели
-        self.bgcolor = ft.colors.BLUE  # Цвет фона
+        self.bgcolor = ft.Colors.BLUE  # Цвет фона
 
         # Горизонтальные отступы (в Flet 0.28.3 используем padding как число)
         self.padding = ft.Padding(20, 0, 20, 0)
@@ -40,8 +40,8 @@ class CustomAppBar(ft.Container):
 
         # 1. КНОПКА ВЫХОДА
         logout_button = ft.IconButton(
-            icon=ft.icons.LOGOUT,
-            icon_color=ft.colors.WHITE,
+            icon=ft.Icons.LOGOUT,
+            icon_color=ft.Colors.WHITE,
             icon_size=24,
             tooltip="Выйти из системы",
             on_click=self._handle_logout,
@@ -49,8 +49,8 @@ class CustomAppBar(ft.Container):
 
         # 2. КНОПКА УВЕДОМЛЕНИЙ
         notifications_button = ft.IconButton(
-            icon=ft.icons.NOTIFICATIONS,
-            icon_color=ft.colors.WHITE,
+            icon=ft.Icons.NOTIFICATIONS,
+            icon_color=ft.Colors.WHITE,
             icon_size=24,
             tooltip="Уведомления",
             on_click=self._handle_notifications,
@@ -61,8 +61,8 @@ class CustomAppBar(ft.Container):
             controls=[
                 # Иконка приложения
                 ft.Icon(
-                    ft.icons.APPS,
-                    color=ft.colors.WHITE,
+                    ft.Icons.APPS,
+                    color=ft.Colors.WHITE,
                     size=28,
                     tooltip="Главная",
                 ),
@@ -71,7 +71,7 @@ class CustomAppBar(ft.Container):
                 ft.Text(
                     "Flet Application",
                     size=24,
-                    color=ft.colors.WHITE,
+                    color=ft.Colors.WHITE,
                     weight=ft.FontWeight.BOLD,
                 ),
 
@@ -118,7 +118,7 @@ class CustomAppBar(ft.Container):
                 ft.TextButton(
                     "Да, выйти",
                     on_click=self._confirm_logout,
-                    style=ft.ButtonStyle(color=ft.colors.RED)
+                    style=ft.ButtonStyle(color=ft.Colors.RED)
                 ),
                 # Кнопка отмены
                 ft.TextButton("Отмена", on_click=self._close_dialog)
@@ -175,19 +175,19 @@ class CustomAppBar(ft.Container):
                     self._create_notification_item(
                         "Новое сообщение",
                         "У вас новое сообщение от администратора",
-                        ft.icons.MESSAGE,
+                        ft.Icons.MESSAGE,
                         "5 минут назад"
                     ),
                     self._create_notification_item(
                         "Обновление системы",
                         "Доступно обновление версии 2.0",
-                        ft.icons.UPDATE,
+                        ft.Icons.UPDATE,
                         "Вчера"
                     ),
                     self._create_notification_item(
                         "Задача завершена",
                         "Ваша задача 'Проект X' завершена",
-                        ft.icons.CHECK_CIRCLE,
+                        ft.Icons.CHECK_CIRCLE,
                         "2 дня назад"
                     ),
                 ],
@@ -198,7 +198,7 @@ class CustomAppBar(ft.Container):
                 ft.TextButton("Закрыть", on_click=self._close_dialog),
                 ft.TextButton("Очистить все",
                               on_click=self._clear_notifications,
-                              style=ft.ButtonStyle(color=ft.colors.BLUE))
+                              style=ft.ButtonStyle(color=ft.Colors.BLUE))
             ],
         )
 
@@ -223,12 +223,12 @@ class CustomAppBar(ft.Container):
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(icon, size=16, color=ft.colors.BLUE),
+                    ft.Icon(icon, size=16, color=ft.Colors.BLUE),
                     ft.Text(title, size=14, weight=ft.FontWeight.BOLD),
                     ft.Container(expand=True),
-                    ft.Text(time, size=11, color=ft.colors.GREY_600),
+                    ft.Text(time, size=11, color=ft.Colors.GREY_600),
                 ]),
-                ft.Text(message, size=12, color=ft.colors.GREY_700),
+                ft.Text(message, size=12, color=ft.Colors.GREY_700),
             ]),
             padding=ft.padding.only(bottom=10),
         )

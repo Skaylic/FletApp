@@ -12,10 +12,10 @@ BUTTON_STYLE = ft.ButtonStyle(
 TITLE_STYLE = ft.TextStyle(
     size=24,
     weight=ft.FontWeight.BOLD,
-    color=ft.colors.PRIMARY,
+    color=ft.Colors.PRIMARY,
 )
 
 LABEL_STYLE = ft.TextStyle(
     size=14,
-    color=ft.colors.ON_SURFACE_VARIANT,
+    color=ft.Colors.ON_SURFACE_VARIANT,
 )
