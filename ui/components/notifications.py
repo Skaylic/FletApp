@@ -1,3 +1,4 @@
+# ui/components/notifications.py
 import flet as ft
 
 def show_snackbar(message: str = '', show: bool = False):

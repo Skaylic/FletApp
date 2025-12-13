@@ -1,3 +1,4 @@
+# ui/components/cards.py
 import flet as ft
 
 class InfoCard(ft.Container):

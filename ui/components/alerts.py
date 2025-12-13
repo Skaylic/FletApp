@@ -1,3 +1,4 @@
+# ui/components/alerts.py
 import flet as ft
 
 

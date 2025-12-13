@@ -1,3 +1,4 @@
+# ui/helpers/styles.py
 import flet as ft
 
 # Общие стили кнопок
