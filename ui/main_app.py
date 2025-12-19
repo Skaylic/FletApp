@@ -1,8 +1,11 @@
 # ui/main_app.py
 import flet as ft
 import threading
+
 from ui.views.dashboard import DashboardView
 from ui.views.settings import SettingsView
+from ui.views.colors import ColorsView
+from ui.views.icons import IconsView
 from ui.layouts.appbar import CustomAppBar
 from ui.layouts.sidebar import Sidebar
 from ui.layouts.base import BaseLayout
@@ -32,7 +35,9 @@ class FletApp(ft.Container):
         # Создаём представления
         self.views = {
             "dashboard": DashboardView(),
-            "settings": SettingsView()
+            "settings": SettingsView(),
+            "colors": ColorsView(),
+            "icons": IconsView()
         }
 
         # Текущее активное представление

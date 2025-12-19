@@ -41,7 +41,8 @@ class Sidebar(ft.Container):
                 # Элементы навигации
                 self._create_menu_item("Dashboard", ft.Icons.DASHBOARD, "dashboard"),
                 self._create_menu_item("Settings", ft.Icons.SETTINGS, "settings"),
-                self._create_menu_item("Analytics", ft.Icons.ANALYTICS, "analytics"),
+                self._create_menu_item("Colors", ft.Icons.COLOR_LENS, "colors"),
+                self._create_menu_item("Icons", ft.Icons.ICECREAM, "icons"),
                 self._create_menu_item("Documents", ft.Icons.DESCRIPTION, "documents"),
             ],
             spacing=0,  # Без отступов между элементами
