@@ -1,6 +1,7 @@
 # ui/layouts/sidebar.py
 import flet as ft
 
+
 class Sidebar(ft.Container):
     """Боковая панель навигации с активными кнопками меню"""
 
