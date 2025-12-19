@@ -5,7 +5,7 @@ import flet as ft
 class Sidebar(ft.Container):
     """Боковая панель навигации с активными кнопками меню"""
 
-    def __init__(self, on_navigate_callback, initial_route="dashboard"):
+    def __init__(self, page: ft.Page = None, on_navigate_callback = None, initial_route="dashboard"):
         """
         Инициализация Sidebar
 
@@ -14,10 +14,12 @@ class Sidebar(ft.Container):
             initial_route: Начальный активный маршрут (по умолчанию "dashboard")
         """
         super().__init__()
+        self.page = page
 
         # Основные настройки контейнера
         self.width = 250  # Фиксированная ширина панели
-        self.bgcolor = ft.Colors.GREY_100  # Цвет фона
+        self.bgcolor = ft.Colors.ON_INVERSE_SURFACE  # Цвет фона
+        self.color = ft.Colors.ON_SURFACE_VARIANT
         self.padding = 0  # Без внутренних отступов
 
         # Состояние активного маршрута
@@ -53,7 +55,7 @@ class Sidebar(ft.Container):
             content=ft.Column(
                 controls=[
                     # Разделитель
-                    ft.Divider(color=ft.Colors.GREY_300),
+                    ft.Divider(color=ft.Colors.ON_SURFACE_VARIANT),
                     # Кнопка выхода
                     self._create_menu_item("Logout", ft.Icons.LOGOUT, "logout", is_danger=True),
                 ],
@@ -206,7 +208,7 @@ class Sidebar(ft.Container):
             return ft.Colors.RED_600  # Красный для опасных действий
         elif is_active:
             return ft.Colors.BLUE_700  # Синий для активного состояния
-        return ft.Colors.BLUE_GREY_800  # Серо-синий для обычного состояния
+        return ft.Colors.ON_SURFACE_VARIANT  # Серо-синий для обычного состояния
 
     def _get_icon_color(self, is_danger: bool, is_active: bool) -> ft.Colors:
         """Возвращает цвет иконки"""
@@ -214,7 +216,7 @@ class Sidebar(ft.Container):
             return ft.Colors.RED_600  # Красный для опасных действий
         elif is_active:
             return ft.Colors.BLUE_600  # Синий для активного состояния
-        return ft.Colors.BLUE_GREY_700  # Серо-синий для обычного состояния
+        return ft.Colors.ON_SURFACE_VARIANT  # Серо-синий для обычного состояния
 
     def _get_text_weight(self, is_active: bool):
         """Возвращает толщину шрифта"""

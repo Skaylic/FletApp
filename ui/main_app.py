@@ -1,13 +1,13 @@
 # ui/main_app.py
 import flet as ft
-import threading
+import asyncio
 from ui.views.dashboard import DashboardView
 from ui.views.settings import SettingsView
 from ui.views.colors import ColorsView
 from ui.views.icons import IconsView
 from ui.layouts.appbar import CustomAppBar
 from ui.layouts.sidebar import Sidebar
-from ui.layouts.base import BaseLayout
+from ui.layouts.footer import Footer
 
 
 class FletApp(ft.Container):
@@ -23,74 +23,135 @@ class FletApp(ft.Container):
         self.init_ui()
 
     def setup_page(self):
-        self.page.title = "Flet App"
+        """Настройка страницы"""
+        self.page.title = "Flet App - Документация и UI компоненты"
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.padding = 0
         self.page.spacing = 0
-        # НЕ вызываем update здесь!
+        self.page.window_min_width = 800
+        self.page.window_min_height = 600
+        self.page.window_width = 1200
+        self.page.window_height = 800
 
     def init_ui(self):
+        """Инициализация интерфейса"""
 
-        # Создаём представления
+        # Создаём представления и передаём page
         self.views = {
-            "dashboard": DashboardView(),
-            "settings": SettingsView(),
-            "colors": ColorsView(),
-            "icons": IconsView()
+            "dashboard": DashboardView(page=self.page),
+            "settings": SettingsView(page=self.page),
+            "colors": ColorsView(page=self.page),
+            "icons": IconsView(page=self.page)
         }
 
         # Текущее активное представление
         self.current_view = self.views["dashboard"]
 
-        # Создаём компоненты (передаём только page в appbar)
-        self.appbar = CustomAppBar(self.page)
+        # Создаём компоненты
+        self.appbar = CustomAppBar(page=self.page)
 
         self.sidebar = Sidebar(
+            page=self.page,
             on_navigate_callback=self.on_navigate,
             initial_route="dashboard"
         )
 
-        # Создаём макет
-        self.layout = BaseLayout(
-            appbar=self.appbar,
-            sidebar=self.sidebar,
-            content=self.current_view,
-            show_footer=True
+        # Создаём футер
+        self.footer = Footer(page=self.page)
+
+        # Создаём основной макет
+        self.content = self.create_main_layout()
+
+    def create_main_layout(self):
+        """Создание основного макета приложения"""
+        return ft.Column(
+            controls=[
+                # AppBar
+                self.appbar,
+
+                # Горизонтальный разделитель
+                ft.Divider(height=1, color=ft.Colors.OUTLINE),
+
+                # Основное содержимое (Sidebar + View)
+                ft.Row(
+                    controls=[
+                        # Sidebar
+                        self.sidebar,
+
+                        # Вертикальный разделитель
+                        ft.VerticalDivider(width=1, color=ft.Colors.OUTLINE),
+
+                        # Контентная область с прокруткой
+                        ft.Container(
+                            content=self.current_view,
+                            expand=True,
+                            padding=10,
+                        ),
+                    ],
+                    expand=True,
+                    spacing=0,
+                ),
+
+                # Футер
+                self.footer,
+            ],
+            expand=True,
+            spacing=0,
         )
 
-        # Устанавливаем контент
-        self.content = self.layout
-
     def on_navigate(self, route: str):
-        """Обработчик навигации с плавной сменой контента"""
+        """Обработчик навигации"""
         if route in self.views:
-            # Плавное скрытие текущего контента
-            if hasattr(self.current_view, 'animate_opacity'):
-                self.current_view.animate_opacity = 0
-            else:
-                self.current_view.opacity = 0
-
-            self.page.update()
-
-            # Смена контента
-            self.current_view = self.views[route]
-            self.layout.content_area = self.current_view
-
-            # Плавное появление нового контента
-            if hasattr(self.current_view, 'animate_opacity'):
-                self.current_view.animate_opacity = 1
-            else:
-                self.current_view.opacity = 1
-
-            # Обновление активной кнопки в сайдбаре
+            # Обновляем активный маршрут в сайдбаре
             self.sidebar.set_active_route(route)
 
-            self.page.update()
+            # Создаем новый view
+            old_view = self.current_view
+            self.current_view = self.views[route]
 
+            # Обновляем layout
+            self.update_layout()
+
+            # Обновляем заголовок окна в зависимости от маршрута
+            self.update_window_title(route)
+
+            # Если нужно, перезагружаем данные в view
+            if hasattr(self.current_view, 'did_mount'):
+                self.current_view.did_mount()
+
+            # Если есть метод загрузки, вызываем его
+            if hasattr(self.current_view, 'load_icons'):
+                self.current_view.load_icons()
+            elif hasattr(self.current_view, 'load_colors'):
+                self.current_view.load_colors()
+
+            # Обновляем страницу
+            if self.page:
+                self.page.update()
         else:
-            # Показать страницу 404 или вернуться на dashboard
+            # Показать страницу 404
             self.show_not_found_page()
 
+    def update_layout(self):
+        """Обновление основного layout"""
+        # Находим контейнер контента в Row
+        content_row = self.content.controls[2]  # Row с sidebar и content
+        # content_row.controls[2] это Container с current_view
+        content_row.controls[2].content = self.current_view
+
+    def update_window_title(self, route: str):
+        """Обновление заголовка окна в зависимости от маршрута"""
+        titles = {
+            "dashboard": "Панель управления",
+            "settings": "Настройки",
+            "colors": "Цвета Flet",
+            "icons": "Иконки Flet"
+        }
+
+        title = titles.get(route, "Flet App")
+        if self.page:
+            self.page.title = f"Flet App - {title}"
+            self.page.update()
 
     def show_not_found_page(self):
         """Страница 404 с автоматическим редиректом"""
@@ -111,13 +172,58 @@ class FletApp(ft.Container):
         )
 
         # Устанавливаем временную страницу
-        self.layout.content_area = not_found_view
-        self.page.update()
+        content_row = self.content.controls[2]
+        content_row.controls[2].content = not_found_view
+
+        if self.page:
+            self.page.update()
 
         # Автоматический редирект через 3 секунды
-        def redirect_to_dashboard():
+        async def redirect_to_dashboard():
+            await asyncio.sleep(3.0)
             self.on_navigate("dashboard")
 
-        # Используем threading для задержки
-        timer = threading.Timer(3.0, redirect_to_dashboard)
-        timer.start()
+        if self.page:
+            self.page.run_task(redirect_to_dashboard)
+
+    def did_mount(self):
+        """Вызывается после монтирования компонента"""
+        # Обновляем заголовок для текущего маршрута
+        route = self.get_current_view_name()
+        self.update_window_title(route)
+
+        # Загружаем данные для текущего view
+        if hasattr(self.current_view, 'load_icons'):
+            self.current_view.load_icons()
+        elif hasattr(self.current_view, 'load_colors'):
+            self.current_view.load_colors()
+
+    def will_unmount(self):
+        """Очистка ресурсов при удалении компонента"""
+        # Очищаем ресурсы футера
+        if self.footer and self.page:
+            # Проверяем, есть ли метод dispose в футере
+            if hasattr(self.footer, 'dispose'):
+                self.page.run_task(self.footer.dispose)
+            # Или метод will_unmount
+            elif hasattr(self.footer, 'will_unmount'):
+                self.footer.will_unmount()
+
+    def get_current_view_name(self) -> str:
+        """Получить название текущего представления"""
+        for name, view in self.views.items():
+            if view == self.current_view:
+                return name
+        return "unknown"
+
+    def refresh_current_view(self):
+        """Обновить текущее представление"""
+        if hasattr(self.current_view, 'load_icons'):
+            self.current_view.load_icons()
+        elif hasattr(self.current_view, 'load_colors'):
+            self.current_view.load_colors()
+        elif hasattr(self.current_view, 'refresh'):
+            self.current_view.refresh()
+
+        if self.page:
+            self.page.update()

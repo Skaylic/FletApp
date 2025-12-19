@@ -31,6 +31,7 @@ class CustomAppBar(ft.Container):
             title=ft.Text(page.title),
             content=ft.Text("Test")
         )
+        self.theme_button = ft.IconButton()
 
         # Инициализация пользовательского интерфейса
         self.init_ui()
@@ -38,7 +39,16 @@ class CustomAppBar(ft.Container):
     def init_ui(self):
         """Инициализация элементов интерфейса AppBar"""
 
-        # 1. КНОПКА ВЫХОДА
+        # 1. КНОПКА ТЕМЫ
+        self.theme_button = ft.IconButton(
+            icon=ft.Icons.NIGHTLIGHT,
+            icon_color=ft.Colors.WHITE,
+            icon_size=24,
+            tooltip="Выйти из системы",
+            on_click=self._handle_theme,
+        )
+
+        # 2. КНОПКА ВЫХОДА
         logout_button = ft.IconButton(
             icon=ft.Icons.LOGOUT,
             icon_color=ft.Colors.WHITE,
@@ -47,7 +57,7 @@ class CustomAppBar(ft.Container):
             on_click=self._handle_logout,
         )
 
-        # 2. КНОПКА УВЕДОМЛЕНИЙ
+        # 3. КНОПКА УВЕДОМЛЕНИЙ
         notifications_button = ft.IconButton(
             icon=ft.Icons.NOTIFICATIONS,
             icon_color=ft.Colors.WHITE,
@@ -56,12 +66,12 @@ class CustomAppBar(ft.Container):
             on_click=self._handle_notifications,
         )
 
-        # 3. ОСНОВНОЙ КОНТЕЙНЕР С ЭЛЕМЕНТАМИ
+        # 4. ОСНОВНОЙ КОНТЕЙНЕР С ЭЛЕМЕНТАМИ
         self.content = ft.Row(
             controls=[
                 # Иконка приложения
                 ft.Icon(
-                    ft.Icons.APPS,
+                    ft.Icons.DIVERSITY_2,
                     color=ft.Colors.WHITE,
                     size=28,
                     tooltip="Главная",
@@ -78,6 +88,9 @@ class CustomAppBar(ft.Container):
                 # Растягиваемое пространство (для выравнивания кнопок справа)
                 ft.Container(expand=True),
 
+                # Кнопка темы
+                self.theme_button,
+
                 # Кнопка уведомлений
                 notifications_button,
 
@@ -90,6 +103,14 @@ class CustomAppBar(ft.Container):
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=10,  # Расстояние между элементами
         )
+
+    def _handle_theme(self, e: ft.ControlEvent):
+        self.page.theme_mode = "light" if self.page.theme_mode == "dark" else "dark"
+        if self.page.theme_mode == "dark":
+            self.theme_button.icon = ft.Icons.LIGHT_MODE
+        else:
+            self.theme_button.icon = ft.Icons.NIGHTLIGHT
+        self.page.update()
 
     def _handle_logout(self, e: ft.ControlEvent):
         """

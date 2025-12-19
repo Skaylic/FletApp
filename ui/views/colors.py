@@ -2,6 +2,7 @@
 import flet as ft
 import re
 from typing import List, Dict, Any, Optional
+import asyncio
 
 
 class ColorsView(ft.Container):
@@ -11,12 +12,16 @@ class ColorsView(ft.Container):
         super().__init__()
         self.page = page
         self.expand = True
-        self.padding = 10  # Уменьшаем общий padding
+        self.padding = 10
 
         # Кэш для всех цветов
         self.all_colors_data: List[Dict[str, Any]] = []
 
-        # Инициализация UI
+        # Флаг для предотвращения многократной инициализации
+        self._initialized = False
+        self._loading = False
+
+        # Инициализация UI без автоматической загрузки
         self.init_ui()
 
     def init_ui(self):
@@ -25,18 +30,18 @@ class ColorsView(ft.Container):
         # Поиск по цветам
         self.search_field = ft.TextField(
             label="Поиск цвета...",
-            expand=True,  # Занимает доступное пространство
+            expand=True,
             on_change=self.filter_colors,
             prefix_icon=ft.Icons.SEARCH,
             suffix=ft.IconButton(
                 icon=ft.Icons.CLOSE,
                 on_click=self.clear_search,
-                icon_size=16,  # Уменьшаем иконку
+                icon_size=16,
                 tooltip="Очистить поиск"
             ),
             on_submit=self.filter_colors,
             hint_text="Введите название или HEX-код",
-            height=40,  # Фиксируем высоту
+            height=40,
         )
 
         # Переключатель тем
@@ -53,27 +58,20 @@ class ColorsView(ft.Container):
             icon=ft.Icons.COPY_ALL,
             on_click=self.copy_all_colors,
             tooltip="Скопировать список всех цветов",
-            height=40,  # Фиксируем высоту
+            height=40,
             style=ft.ButtonStyle(
-                padding={ft.ControlState.DEFAULT: 8}  # Уменьшаем padding
+                padding={ft.ControlState.DEFAULT: 8}
             )
         )
 
-        # Сетка цветов - УВЕЛИЧИВАЕМ колонок для более плотного расположения
+        # Сетка цветов
         self.colors_grid = ft.GridView(
             expand=True,
-            runs_count=5,  # Увеличиваем количество колонок
-            max_extent=100,  # Уменьшаем ширину карточки
-            child_aspect_ratio=0.5,  # Делаем более приземистыми
-            spacing=4,  # Минимальные отступы
+            runs_count=5,
+            max_extent=100,
+            child_aspect_ratio=0.5,
+            spacing=4,
             run_spacing=4
-        )
-
-        # Индикатор загрузки
-        self.loading_indicator = ft.ProgressRing(
-            width=20,
-            height=20,
-            visible=False
         )
 
         # Основной контент
@@ -86,7 +84,7 @@ class ColorsView(ft.Container):
                                 ft.Column([
                                     ft.Text(
                                         "🎨 Палитра цветов Flet",
-                                        size=24,  # Уменьшаем заголовок
+                                        size=24,
                                         weight=ft.FontWeight.BOLD
                                     ),
                                 ], expand=True),
@@ -97,16 +95,16 @@ class ColorsView(ft.Container):
                         ft.Row(
                             controls=[
                                 self.search_field,
-                                ft.Container(width=10),  # Уменьшаем отступ
+                                ft.Container(width=10),
                                 self.theme_toggle,
-                                ft.Container(width=10),  # Уменьшаем отступ
+                                ft.Container(width=10),
                                 self.copy_all_btn
                             ],
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                            spacing=8  # Уменьшаем spacing
+                            spacing=8
                         ),
                     ]),
-                    padding=ft.padding.only(bottom=10)  # Уменьшаем padding
+                    padding=ft.padding.only(bottom=10)
                 ),
                 ft.Divider(height=1),
                 ft.Container(
@@ -117,62 +115,67 @@ class ColorsView(ft.Container):
             ],
             scroll=ft.ScrollMode.AUTO,
             expand=True,
-            spacing=0  # Убираем spacing между элементами
+            spacing=0
         )
 
-        # Загружаем цвета
-        self.load_colors()
+    def did_mount(self):
+        """Вызывается после монтирования компонента"""
+        if not self._initialized and self.page:
+            self.page.run_task(self.load_colors_async)
 
-    def load_colors(self):
-        """Загружает все цвета с индикацией процесса"""
-        self.loading_indicator.visible = True
-        if self.page:
-            self.page.update()
+    async def load_colors_async(self):
+        """Асинхронная загрузка цветов"""
+        if self._loading:
+            return
 
-        self.load_all_colors()
+        self._loading = True
+        try:
+            await self._load_colors_task()
+        finally:
+            self._loading = False
+            self._initialized = True
 
-        self.loading_indicator.visible = False
-        if self.page:
-            self.page.update()
+    async def _load_colors_task(self):
+        """Задача загрузки цветов"""
+        # Получаем цвета
+        colors_data = await self._get_colors_data()
+        categorized = self._categorize_colors(colors_data)
 
-    def load_all_colors(self):
-        """Загружает и категоризирует все цвета Flet"""
-        self.all_colors_data.clear()
+        # Очищаем сетку
         self.colors_grid.controls.clear()
+        self.all_colors_data.clear()
 
-        colors_data = self.get_all_ft_colors()
-        categorized = self.categorize_colors(colors_data)
-
+        # Заполняем сетку
         for category_name, colors in categorized.items():
-            if not colors:  # Пропускаем пустые категории
+            if not colors:
                 continue
 
-            # Заголовок категории - делаем компактнее
+            # Заголовок категории
             self.colors_grid.controls.append(
                 ft.Container(
                     content=ft.Text(
                         category_name,
-                        size=14,  # Уменьшаем шрифт
+                        size=14,
                         weight=ft.FontWeight.BOLD,
                         color=(ft.Colors.GREY_300 if self.theme_toggle.value
                                else ft.Colors.GREY_700)
                     ),
-                    padding=ft.padding.only(top=15, bottom=5, left=2),  # Уменьшаем padding
-                    col=7  # Занимает всю ширину
+                    padding=ft.padding.only(top=15, bottom=5, left=2),
+                    col=7
                 )
             )
 
             # Карточки цветов
             for color_data in colors:
-                card = self.create_color_card(color_data)
+                card = self._create_color_card(color_data)
                 self.colors_grid.controls.append(card)
                 self.all_colors_data.append(color_data)
 
-        if self.page:
-            self.page.update()
+        # Безопасное обновление только этого компонента
+        self.update()
 
-    def get_all_ft_colors(self) -> List[Dict[str, Any]]:
-        """Получает все цвета из ft.Colors (Enum) через рефлексию"""
+    async def _get_colors_data(self) -> List[Dict[str, Any]]:
+        """Асинхронно получает данные цветов"""
         colors = []
 
         # Получаем всех членов перечисления ft.Colors
@@ -184,9 +187,12 @@ class ColorsView(ft.Container):
                 'display_value': f"ft.Colors.{color_name}"
             })
 
+            # Даем возможность другим задачам работать
+            await asyncio.sleep(0)
+
         return colors
 
-    def categorize_colors(self, colors_data: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    def _categorize_colors(self, colors_data: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
         """Категоризирует цвета по типам"""
         categories = {
             "Основные цвета": [],
@@ -225,7 +231,7 @@ class ColorsView(ft.Container):
 
         return categories
 
-    def get_contrast_color_for_block(self, color_enum) -> ft.Colors:
+    def _get_contrast_color_for_block(self, color_enum) -> ft.Colors:
         """Возвращает контрастный цвет (BLACK или WHITE) для заданного цвета."""
         color_name = color_enum.name
 
@@ -250,14 +256,14 @@ class ColorsView(ft.Container):
         # По умолчанию белый текст
         return ft.Colors.WHITE
 
-    def create_color_card(self, color_data: Dict[str, Any]) -> ft.Container:
-        """Создаёт карточку для отображения цвета - МИНИМАЛЬНАЯ ВЫСОТА"""
+    def _create_color_card(self, color_data: Dict[str, Any]) -> ft.Container:
+        """Создаёт карточку для отображения цвета"""
         name = color_data['name']
         obj = color_data['object']
         display_value = color_data['display_value']
 
         # Контрастный цвет для иконки
-        icon_color = self.get_contrast_color_for_block(obj)
+        icon_color = self._get_contrast_color_for_block(obj)
 
         # Цвет для текста на фоне карточки
         text_color = ft.Colors.BLACK if not self.theme_toggle.value else ft.Colors.WHITE
@@ -267,30 +273,28 @@ class ColorsView(ft.Container):
         return ft.Container(
             content=ft.Column(
                 controls=[
-                    # Блок с цветом - МИНИМАЛЬНАЯ ВЫСОТА
+                    # Блок с цветом
                     ft.Container(
                         bgcolor=obj,
-                        height=40,  # Минимальная высота цветного блока
+                        height=40,
                         expand=True,
-                        on_click=lambda e: self.copy_color(display_value),
+                        on_click=lambda e: self._copy_color(display_value),
                         ink=True,
                         tooltip=f"Кликните чтобы скопировать\n{display_value}",
                         alignment=ft.alignment.center,
-                        # Иконку делаем меньше и менее заметной
                         content=ft.Icon(
                             ft.Icons.CONTENT_COPY,
                             color=icon_color,
-                            size=20,  # Маленькая иконка
-                            opacity=0.4  # Почти прозрачная
+                            size=20,
+                            opacity=0.4
                         )
                     ),
-                    # Информация о цвете - КОМПАКТНАЯ
+                    # Информация о цвете
                     ft.Container(
                         content=ft.Column([
-                            # Только название цвета, без значения
                             ft.Text(
                                 name.replace('_', ' ').title(),
-                                size=12,  # Очень маленький шрифт
+                                size=12,
                                 weight=ft.FontWeight.BOLD,
                                 color=text_color,
                                 max_lines=1,
@@ -298,33 +302,32 @@ class ColorsView(ft.Container):
                                 text_align=ft.TextAlign.CENTER
                             ),
                         ], spacing=0, tight=True),
-                        padding=ft.padding.all(2)  # Минимальные отступы
+                        padding=ft.padding.all(2)
                     )
                 ],
-                spacing=1,  # Минимальный spacing
+                spacing=1,
                 tight=True,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER
             ),
             bgcolor=bg_color,
-            # Без границ и теней для максимальной компактности
             data=color_data
         )
 
-    def copy_color(self, color_value: str):
+    def _copy_color(self, color_value: str):
         """Копирует значение цвета в буфер обмена"""
         try:
             if self.page:
                 self.page.set_clipboard(color_value)
-                self.show_snackbar(f"Скопировано: {color_value}")
+                self._show_snackbar(f"Скопировано: {color_value}")
             else:
                 try:
                     import pyperclip
                     pyperclip.copy(color_value)
-                    self.show_snackbar(f"Скопировано: {color_value}")
+                    self._show_snackbar(f"Скопировано: {color_value}")
                 except ImportError:
-                    self.show_snackbar("Не удалось скопировать")
+                    self._show_snackbar("Не удалось скопировать")
         except Exception as e:
-            self.show_snackbar(f"Ошибка копирования: {str(e)}")
+            self._show_snackbar(f"Ошибка копирования: {str(e)}")
 
     def copy_all_colors(self, e):
         """Копирует список всех цветов в буфер обмена"""
@@ -335,16 +338,16 @@ class ColorsView(ft.Container):
 
             if self.page:
                 self.page.set_clipboard(colors_text)
-                self.show_snackbar("Все цвета скопированы!")
+                self._show_snackbar("Все цвета скопированы!")
             else:
                 try:
                     import pyperclip
                     pyperclip.copy(colors_text)
-                    self.show_snackbar("Все цвета скопированы!")
+                    self._show_snackbar("Все цвета скопированы!")
                 except ImportError:
-                    self.show_snackbar("pyperclip не установлен")
+                    self._show_snackbar("pyperclip не установлен")
         except Exception as e:
-            self.show_snackbar(f"Ошибка: {str(e)}")
+            self._show_snackbar(f"Ошибка: {str(e)}")
 
     def filter_colors(self, e):
         """Фильтрует цвета по поисковому запросу"""
@@ -363,8 +366,7 @@ class ColorsView(ft.Container):
                 # Заголовок категории
                 control.visible = True
 
-        if self.page:
-            self.page.update()
+        self.update()
 
     def clear_search(self, e):
         """Очищает поле поиска"""
@@ -390,58 +392,21 @@ class ColorsView(ft.Container):
                         if isinstance(item, ft.Text) and hasattr(item, 'color'):
                             item.color = text_color
 
-        if self.page:
-            self.page.update()
+        self.update()
 
-    def show_snackbar(self, message: str):
+    def _show_snackbar(self, message: str):
         """Показывает SnackBar с сообщением"""
         if self.page:
             snackbar = ft.SnackBar(
-                content=ft.Text(message, size=12),  # Уменьшаем шрифт
-                duration=2000,  # Укорачиваем время показа
+                content=ft.Text(message, size=12),
+                duration=2000,
             )
             self.page.snack_bar = snackbar
             snackbar.open = True
-            self.page.update()
+            if not self.page.disposed:
+                self.page.update()
         else:
             print(f"[Snackbar] {message}")
-
-    # --- ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ---
-
-    def on_resize(self, e):
-        """Обрабатывает изменение размера окна"""
-        if self.page and self.page.width:
-            # Адаптивное количество колонок
-            if self.page.width < 600:
-                cols = 4
-            elif self.page.width < 900:
-                cols = 5
-            elif self.page.width < 1200:
-                cols = 6
-            else:
-                cols = 7
-            self.colors_grid.runs_count = cols
-            self.page.update()
-
-    def init_event_listeners(self):
-        """Подключает обработчики событий"""
-        if self.page:
-            self.page.on_resize = self.on_resize
-
-    def did_mount(self):
-        """Вызывается после монтирования компонента"""
-        self.init_event_listeners()
-
-    def will_unmount(self):
-        """Вызывается перед удалением компонента"""
-        pass
-
-    def debug_print_colors(self):
-        """Вывод всех цветов в консоль для отладки"""
-        print("\n=== ВСЕ ЦВЕТА FLET ===")
-        for color in self.all_colors_data:
-            print(f"{color['display_value']} = {color['value']}")
-        print(f"\nВсего цветов: {len(self.all_colors_data)}")
 
     def get_color_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """Поиск цвета по имени"""

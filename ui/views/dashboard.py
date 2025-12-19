@@ -4,8 +4,9 @@ from ui.components.cards import InfoCard
 
 
 class DashboardView(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page = None):
         super().__init__()
+        self.page = page
         self.expand = True
         self.padding = 20
         self.init_ui()
