@@ -1,5 +1,5 @@
+# ui/views/icons.py
 import flet as ft
-import re
 from typing import List, Dict, Any, Optional
 
 

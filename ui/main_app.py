@@ -1,7 +1,6 @@
 # ui/main_app.py
 import flet as ft
 import threading
-
 from ui.views.dashboard import DashboardView
 from ui.views.settings import SettingsView
 from ui.views.colors import ColorsView
