@@ -2,6 +2,7 @@
 import flet as ft
 from typing import List, Dict, Any, Optional
 
+
 class IconsView(ft.Container):
     """Страница с библиотекой иконок Flet"""
 
