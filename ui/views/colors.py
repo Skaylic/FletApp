@@ -3,7 +3,6 @@ import flet as ft
 import re
 from typing import List, Dict, Any, Optional
 
-
 class ColorsView(ft.Container):
     """Страница с палитрой цветов Flet"""
 

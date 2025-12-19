@@ -9,7 +9,6 @@ from ui.layouts.appbar import CustomAppBar
 from ui.layouts.sidebar import Sidebar
 from ui.layouts.base import BaseLayout
 
-
 class FletApp(ft.Container):
     def __init__(self, page: ft.Page):
         super().__init__()
